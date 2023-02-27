@@ -2,9 +2,10 @@ version: "3.5"
 
 services:
   server:
-    build:
-      context: ./docker/golang
-      dockerfile: Dockerfile
+    image: golang:1.19.6-alpine3.16
+    # build:
+      # context: ./docker/golang
+      # dockerfile: Dockerfile
     volumes:
       - .:/server
     working_dir: /server
@@ -12,7 +13,7 @@ services:
       - "5000:5000"
     depends_on:
       - db
-    entrypoint: go run main.go
+    entrypoint: go run ./go-server/cmd/main.go
     restart: always
   db:
     image: postgres:12.4-alpine
@@ -22,4 +23,9 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - PGDATA=/var/lib/postgresql/data/pgdata
+      # - POSTGRES_USER={DB_USER}
+      # - POSTGRES_PASSWORD={DB_PASSWORD}
+      # - PGDATA=/var/lib/postgresql/data/pgdata
     restart: always
+    volumes:
+      - ./go-server/initdb.sh:/docker-entrypoint-initdb/init.sh
